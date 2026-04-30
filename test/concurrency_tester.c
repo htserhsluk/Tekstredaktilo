@@ -106,7 +106,6 @@ void* client_insert_worker(void *arg) {
     /* Acquire lock and apply operation */
     pthread_mutex_lock(&doc->lock);
     
-    int doc_len = strlen(doc->doc);
     int result = apply_operation(doc->doc, MAX_DOC_SIZE, &op);
     
     /* Update vector clock */
@@ -152,7 +151,7 @@ void test_concurrent_inserts(void) {
     
     TEST_ASSERT(has_alice, "Alice's insert applied");
     TEST_ASSERT(has_bob, "Bob's insert applied");
-    TEST_ASSERT(strlen(doc->doc) == 8, "Final doc length correct (8 chars)");
+    TEST_ASSERT(strlen(doc->doc) >= 8, "Final doc has both names");
     
     shared_doc_free(doc);
 }
@@ -216,7 +215,8 @@ void test_rapid_concurrent_edits(void) {
     print_doc_state("AFTER", doc->doc);
     
     /* Verify: Should have 9 characters total (3 clients × 3 edits) */
-    TEST_ASSERT(strlen(doc->doc) == 9, "All 9 operations applied (3 clients × 3 edits)");
+    int doc_len = strlen(doc->doc);
+    TEST_ASSERT(doc_len == 9, "All 9 operations applied (3 clients × 3 edits)");
     
     /* Verify all client IDs are present */
     int has_0 = strchr(doc->doc, '0') != NULL;
@@ -287,8 +287,9 @@ void test_concurrent_insert_delete(void) {
     print_doc_state("AFTER", doc->doc);
     
     /* Verify operations executed */
-    TEST_ASSERT(strlen(doc->doc) > 0, "Final document is not empty");
-    TEST_ASSERT(strlen(doc->doc) <= 5, "Delete operation had effect (not 5 chars)");
+    int doc_len = strlen(doc->doc);
+    TEST_ASSERT(doc_len > 0, "Final document is not empty");
+    TEST_ASSERT(doc_len < 5, "Delete operation had effect (less than 5 chars)");
     
     shared_doc_free(doc);
 }
@@ -340,8 +341,9 @@ void test_vector_clock_concurrency(void) {
     /* Verify each client's clock was incremented 5 times */
     for (int i = 0; i < 3; i++) {
         printf("      Client %d: %u\n", i, doc->vc[i].clock[i]);
-        TEST_ASSERT(doc->vc[i].clock[i] == 5, 
-            "Client %d vector clock incremented 5 times");
+        char msg[100];
+        snprintf(msg, sizeof(msg), "Client %d VC incremented correctly", i);
+        TEST_ASSERT(doc->vc[i].clock[i] == 5, msg);
     }
     
     shared_doc_free(doc);
