@@ -15,8 +15,8 @@ LOGGER_SRCS  = $(COMMON_SRCS) $(SRC_DIR)/logger_proc.c
 
 all: dirs server client logger
 
-dirs:
-	@mkdir -p data logs
+#dirs:
+#	@mkdir -p data logs
 
 server: $(SERVER_SRCS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
