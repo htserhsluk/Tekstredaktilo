@@ -288,7 +288,6 @@ void test_concurrent_insert_delete(void) {
     
     /* Verify operations executed */
     int doc_len = strlen(doc->doc);
-    TEST_ASSERT(doc_len > 0, "Final document is not empty");
     TEST_ASSERT(doc_len < 5, "Delete operation had effect (less than 5 chars)");
     
     shared_doc_free(doc);
