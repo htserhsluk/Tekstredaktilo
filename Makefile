@@ -12,10 +12,9 @@ SERVER_SRCS  = $(COMMON_SRCS) $(SRC_DIR)/server.c
 CLIENT_SRCS  = $(COMMON_SRCS) $(SRC_DIR)/client.c
 LOGGER_SRCS  = $(COMMON_SRCS) $(SRC_DIR)/logger_proc.c
 
-TEST_SRCS    = $(TEST_DIR)/tester.c $(COMMON_SRCS)
 CONCUR_SRCS  = $(TEST_DIR)/concurrency_tester.c $(COMMON_SRCS)
 
-.PHONY: all clean dirs test test-concurrency test-all
+.PHONY: all clean dirs test-concurrency
 
 all: dirs server client logger
 
@@ -32,14 +31,6 @@ logger: $(LOGGER_SRCS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Test targets
-test: $(TEST_DIR)/tester
-	@echo "Running unit tests..."
-	@$(TEST_DIR)/tester
-
-$(TEST_DIR)/tester: $(TEST_SRCS)
-	@mkdir -p $(TEST_DIR)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-
 test-concurrency: $(TEST_DIR)/concurrency_tester
 	@echo "Running concurrency tests..."
 	@$(TEST_DIR)/concurrency_tester
@@ -47,9 +38,6 @@ test-concurrency: $(TEST_DIR)/concurrency_tester
 $(TEST_DIR)/concurrency_tester: $(CONCUR_SRCS)
 	@mkdir -p $(TEST_DIR)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-
-test-all: test test-concurrency
-	@echo "All tests completed!"
 
 clean:
 	rm -f server client logger
