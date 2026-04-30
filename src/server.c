@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <linux/time.h>
+//#include <linux/time.h>
 #include "common.h"
 #include "ot_engine.h"
 #include "auth.h"
